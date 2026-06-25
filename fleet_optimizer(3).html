@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FleetRoute — Transport Pétrolier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0F1117;--bg2:#181B23;--bg3:#1F2330;--bg4:#262C3A;
+  --orange:#F5A623;--orange2:#E8921A;--steel:#8B9BAA;--white:#E8E4D9;
+  --border:#2E3545;--green:#2ECC71;--red:#E74C3C;--blue:#3B8BEB;
+  --radius:10px;--radius-sm:6px;
+}
+body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.main{flex:1;overflow-y:auto;padding:28px;}
+.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+.logo-title{font-family:'Roboto Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--orange);letter-spacing:1px;}
+.logo-sub{font-size:11px;color:var(--steel);margin-top:2px;}
+.nav-section{padding:14px 10px 4px;font-size:10px;letter-spacing:1.5px;color:var(--steel);font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-radius:var(--radius-sm);margin:1px 6px;color:var(--steel);font-size:13px;transition:all .15s;}
+.nav-item:hover{background:var(--bg3);color:var(--white);}
+.nav-item.active{background:var(--bg4);color:var(--orange);}
+.nav-item i{width:16px;text-align:center;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Roboto Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--white);letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title i{color:var(--orange);}
+input,select,textarea{background:var(--bg3);border:1px solid var(--border);color:var(--white);border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none;transition:border .15s;}
+input:focus,select:focus{border-color:var(--orange);}
+select option{background:var(--bg3);}
+label{font-size:12px;color:var(--steel);display:block;margin-bottom:4px;font-weight:500;}
+.form-grid{display:grid;gap:12px;}
+.form-grid.cols2{grid-template-columns:1fr 1fr;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;transition:all .15s;text-decoration:none;}
+.btn-primary{background:var(--orange);color:#111;}
+.btn-primary:hover{background:var(--orange2);}
+.btn-secondary{background:var(--bg4);color:var(--white);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--bg3);}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-green{background:var(--green);color:#111;}
+.btn-green:hover{opacity:.85;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-blue:hover{opacity:.85;}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{text-align:left;padding:8px 12px;font-size:11px;letter-spacing:1px;color:var(--steel);font-weight:600;border-bottom:1px solid var(--border);}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--bg3);}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.badge-green{background:rgba(46,204,113,.15);color:var(--green);}
+.badge-orange{background:rgba(245,166,35,.15);color:var(--orange);}
+.badge-red{background:rgba(231,76,60,.15);color:var(--red);}
+.badge-blue{background:rgba(59,139,235,.15);color:var(--blue);}
+.page-header{margin-bottom:24px;}
+.page-title{font-family:'Roboto Condensed',sans-serif;font-size:26px;font-weight:700;color:var(--white);}
+.page-sub{color:var(--steel);font-size:13px;margin-top:4px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.stat-label{font-size:11px;color:var(--steel);letter-spacing:.5px;text-transform:uppercase;}
+.stat-value{font-size:26px;font-weight:600;color:var(--white);font-family:'Roboto Condensed',sans-serif;margin-top:4px;}
+.stat-value span{font-size:13px;color:var(--steel);}
+.step{display:flex;gap:12px;align-items:flex-start;}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;}
+.step-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.step-line{width:1px;height:22px;background:var(--border);margin:2px 0;}
+.step-content{padding:4px 0 16px;flex:1;}
+.step-name{font-size:13px;font-weight:500;color:var(--white);}
+.step-note{font-size:12px;color:var(--steel);margin-top:2px;}
+.trip-card{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+.trip-header{background:var(--bg3);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+.trip-body{padding:14px 16px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Roboto Condensed',sans-serif;font-size:18px;font-weight:700;margin-bottom:18px;}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+.driver-display{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:8px;}
+.driver-avatar{width:40px;height:40px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#111;flex-shrink:0;}
+.info-row{display:flex;gap:8px;align-items:center;padding:3px 0;font-size:12px;color:var(--steel);}
+.info-row i{width:14px;}
+.info-row strong{color:var(--white);}
+.flex{display:flex;}.items-center{align-items:center;}.justify-between{justify-content:space-between;}.gap-8{gap:8px;}.gap-12{gap:12px;}
+.hidden{display:none!important;}
+.page{display:none;}.page.active{display:block;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+.summary-cell{background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center;}
+.summary-val{font-size:22px;font-weight:600;font-family:'Roboto Condensed',sans-serif;color:var(--white);}
+.summary-lbl{font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-title">⛽ FLEETROUTE</div>
+    <div class="logo-sub">Transport Pétrolier</div>
+  </div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item active" onclick="showPage('dashboard',this)"><i class="fa fa-gauge"></i> Tableau de bord</div>
+  <div class="nav-item" onclick="showPage('planner',this)"><i class="fa fa-route"></i> Planifier trajet</div>
+  <div class="nav-section">Base de données</div>
+  <div class="nav-item" onclick="showPage('stations',this)"><i class="fa fa-gas-pump"></i> Stations</div>
+  <div class="nav-item" onclick="showPage('refineries',this)"><i class="fa fa-industry"></i> Raffineries</div>
+  <div class="nav-item" onclick="showPage('drivers',this)"><i class="fa fa-id-card"></i> Chauffeurs</div>
+  <div class="nav-item" onclick="showPage('trucks',this)"><i class="fa fa-truck"></i> Camions</div>
+  <div style="flex:1;"></div>
+  <div style="padding:14px;border-top:1px solid var(--border);font-size:11px;color:var(--steel);">v1.0 — Maps/Waze externe</div>
+</aside>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="page-header">
+    <div class="page-title">Tableau de bord</div>
+    <div class="page-sub" id="dash-date"></div>
+  </div>
+  <div class="stats-row" id="stats-row"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-title"><i class="fa fa-clock"></i> Derniers trajets</div>
+      <div id="recent-trips" style="color:var(--steel);font-size:13px;">Aucun trajet planifié.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fa fa-truck"></i> État de la flotte</div>
+      <div id="fleet-summary"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLANNER -->
+<div id="page-planner" class="page">
+  <div class="page-header">
+    <div class="page-title">Planifier un trajet</div>
+    <div class="page-sub">Sélectionnez chauffeur, camion, raffinerie et stations à livrer</div>
+  </div>
+  <div style="display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start;">
+    <div>
+      <div class="card">
+        <div class="card-title"><i class="fa fa-user"></i> Chauffeur & Camion</div>
+        <div class="form-grid">
+          <div>
+            <label>Chauffeur</label>
+            <select id="plan-driver" onchange="onDriverChange()"><option value="">— Sélectionner —</option></select>
+          </div>
+          <div id="driver-info-box" class="hidden"></div>
+          <div>
+            <label>Camion</label>
+            <select id="plan-truck" onchange="onTruckChange()"><option value="">— Sélectionner —</option></select>
+          </div>
+          <div id="truck-info-box" class="hidden"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fa fa-industry"></i> Raffinerie de départ</div>
+        <select id="plan-refinery" onchange="onRefineryChange()"><option value="">— Sélectionner —</option></select>
+        <div id="refinery-addr" style="font-size:12px;color:var(--steel);margin-top:6px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fa fa-gas-pump"></i> Stations à livrer</div>
+        <div class="flex gap-8" style="margin-bottom:10px;">
+          <select id="plan-add-station" style="flex:1;"><option value="">— Choisir une station —</option></select>
+          <button class="btn btn-secondary btn-sm" onclick="addStationToTrip()"><i class="fa fa-plus"></i> Ajouter</button>
+        </div>
+        <div id="plan-stations-list"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="calcRoute()">
+        <i class="fa fa-calculator"></i> Calculer la route optimale
+      </button>
+    </div>
+    <div id="plan-result">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:40px;text-align:center;color:var(--steel);">
+        <i class="fa fa-route" style="font-size:32px;display:block;margin-bottom:12px;opacity:.3;"></i>
+        <div style="font-size:14px;">Configurez le trajet à gauche<br>et cliquez sur Calculer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATIONS -->
+<div id="page-stations" class="page">
+  <div class="page-header flex justify-between items-center">
+    <div><div class="page-title">Stations service</div><div class="page-sub">Points de livraison</div></div>
+    <button class="btn btn-primary" onclick="openModal('station')"><i class="fa fa-plus"></i> Nouvelle station</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="data-table">
+      <thead><tr><th>Nom</th><th>Adresse</th><th>Capacité max</th><th>Contact</th><th>Statut</th><th></th></tr></thead>
+      <tbody id="stations-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- REFINERIES -->
+<div id="page-refineries" class="page">
+  <div class="page-header flex justify-between items-center">
+    <div><div class="page-title">Raffineries</div><div class="page-sub">Points de ravitaillement</div></div>
+    <button class="btn btn-primary" onclick="openModal('refinery')"><i class="fa fa-plus"></i> Nouvelle raffinerie</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="data-table">
+      <thead><tr><th>Nom</th><th>Adresse</th><th>Carburant</th><th>Contact</th><th>Statut</th><th></th></tr></thead>
+      <tbody id="refineries-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- DRIVERS -->
+<div id="page-drivers" class="page">
+  <div class="page-header flex justify-between items-center">
+    <div><div class="page-title">Chauffeurs</div><div class="page-sub">Personnel de conduite</div></div>
+    <button class="btn btn-primary" onclick="openModal('driver')"><i class="fa fa-plus"></i> Nouveau chauffeur</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="data-table">
+      <thead><tr><th>Nom</th><th>Téléphone</th><th>Permis</th><th>Camion assigné</th><th>Statut</th><th></th></tr></thead>
+      <tbody id="drivers-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TRUCKS -->
+<div id="page-trucks" class="page">
+  <div class="page-header flex justify-between items-center">
+    <div><div class="page-title">Camions</div><div class="page-sub">Flotte de véhicules</div></div>
+    <button class="btn btn-primary" onclick="openModal('truck')"><i class="fa fa-plus"></i> Nouveau camion</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="data-table">
+      <thead><tr><th>Plaque</th><th>Modèle</th><th>Capacité (L)</th><th>Compartiments</th><th>Statut</th><th></th></tr></thead>
+      <tbody id="trucks-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+<div class="modal">
+  <div class="modal-title" id="modal-title"></div>
+  <div id="modal-body"></div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+    <button class="btn btn-primary" onclick="saveModal()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<script>
+const DB_KEY='fleetroute_db';
+let DB={stations:[],refineries:[],drivers:[],trucks:[],trips:[]};
+
+function loadDB(){
+  try{const d=localStorage.getItem(DB_KEY);if(d)DB=JSON.parse(d);}catch(e){}
+  if(!DB.stations||!DB.stations.length) seedData();
+  if(!DB.trips) DB.trips=[];
+}
+function saveDB(){localStorage.setItem(DB_KEY,JSON.stringify(DB));}
+
+function seedData(){
+  DB.stations=[
+    {id:1,name:'Station Laval Est',address:'2450 Boulevard Daniel-Johnson, Laval, QC, Canada',maxLiters:15000,contact:'Martin Côté — 450-555-1234',status:'active'},
+    {id:2,name:'Station Longueuil Centre',address:'875 Rue Saint-Charles Ouest, Longueuil, QC, Canada',maxLiters:20000,contact:'Julie Tremblay — 450-555-5678',status:'active'},
+    {id:3,name:'Station Brossard',address:'6600 Boulevard Taschereau, Brossard, QC, Canada',maxLiters:12000,contact:'Pierre Dubois — 450-555-9012',status:'active'},
+    {id:4,name:'Station Repentigny',address:'999 Boulevard Brien, Repentigny, QC, Canada',maxLiters:18000,contact:'Sophie Gagnon — 450-555-3456',status:'active'},
+  ];
+  DB.refineries=[
+    {id:1,name:'Raffinerie de Montréal-Est',address:'3700 Rue Notre-Dame Est, Montréal-Est, QC, Canada',fuel:'Diesel / Essence',contact:'Ops: 514-555-0001',status:'active'},
+    {id:2,name:'Dépôt Pétro-Nord Laval',address:'4000 Autoroute 440 Ouest, Laval, QC, Canada',fuel:'Diesel',contact:'Ops: 450-555-0002',status:'active'},
+  ];
+  DB.drivers=[
+    {id:1,name:'Jacques Beaulieu',phone:'514-555-1111',license:'Classe 1 + HDGM',truck:'FL-001',status:'available'},
+    {id:2,name:'Marie-Claude Forget',phone:'514-555-2222',license:'Classe 1 + HDGM',truck:'FL-002',status:'available'},
+    {id:3,name:'Robert Tanguay',phone:'514-555-3333',license:'Classe 3 + HDGM',truck:'',status:'off'},
+  ];
+  DB.trucks=[
+    {id:1,plate:'FL-001',model:'Volvo FH 2022',capacity:25000,compartments:4,status:'available'},
+    {id:2,plate:'FL-002',model:'Kenworth T680 2023',capacity:35000,compartments:6,status:'available'},
+    {id:3,plate:'FL-003',model:'Peterbilt 579 2021',capacity:30000,compartments:5,status:'maintenance'},
+  ];
+  DB.trips=[];
+  saveDB();
+}
+
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='stations') renderTable('stations');
+  if(id==='refineries') renderTable('refineries');
+  if(id==='drivers') renderTable('drivers');
+  if(id==='trucks') renderTable('trucks');
+  if(id==='planner') renderPlanner();
+}
+
+function renderDashboard(){
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('fr-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Stations</div><div class="stat-value">${DB.stations.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Raffineries</div><div class="stat-value">${DB.refineries.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Chauffeurs dispo</div><div class="stat-value">${DB.drivers.filter(d=>d.status==='available').length} <span>/ ${DB.drivers.length}</span></div></div>
+    <div class="stat-card"><div class="stat-label">Camions dispo</div><div class="stat-value">${DB.trucks.filter(t=>t.status==='available').length} <span>/ ${DB.trucks.length}</span></div></div>`;
+  const rt=document.getElementById('recent-trips');
+  if(!DB.trips.length){rt.innerHTML='<span style="color:var(--steel);">Aucun trajet planifié.</span>';}
+  else rt.innerHTML=DB.trips.slice(-6).reverse().map(t=>`
+    <div style="padding:8px 0;border-bottom:1px solid var(--border);">
+      <div class="flex justify-between items-center">
+        <span style="font-weight:500;font-size:13px;">${t.driver} — ${t.truck}</span>
+        <span class="badge badge-blue">${t.voyages} voyage(s)</span>
+      </div>
+      <div style="font-size:12px;color:var(--steel);margin-top:2px;">${t.date} · ${t.stationsCount} stations · ${t.liters.toLocaleString('fr-CA')} L</div>
+    </div>`).join('');
+  document.getElementById('fleet-summary').innerHTML=DB.trucks.map(t=>`
+    <div class="flex justify-between items-center" style="padding:7px 0;border-bottom:1px solid var(--border);">
+      <div><span style="font-weight:500;">${t.plate}</span> <span style="color:var(--steel);font-size:12px;">${t.model}</span></div>
+      <span class="badge ${t.status==='available'?'badge-green':t.status==='maintenance'?'badge-red':'badge-orange'}">${t.status==='available'?'Disponible':t.status==='maintenance'?'Maintenance':'En route'}</span>
+    </div>`).join('');
+}
+
+function renderTable(type){
+  if(type==='stations'){
+    document.getElementById('stations-tbody').innerHTML=DB.stations.map(s=>`<tr>
+      <td><strong>${s.name}</strong></td><td style="color:var(--steel);font-size:12px;">${s.address}</td>
+      <td>${(s.maxLiters||0).toLocaleString('fr-CA')} L</td><td style="color:var(--steel);font-size:12px;">${s.contact||'—'}</td>
+      <td><span class="badge ${s.status==='active'?'badge-green':'badge-red'}">${s.status==='active'?'Active':'Inactive'}</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="openEdit('station',${s.id})"><i class="fa fa-pen"></i></button> <button class="btn btn-danger btn-sm" onclick="delItem('stations',${s.id})"><i class="fa fa-trash"></i></button></td>
+    </tr>`).join('');
+  }
+  if(type==='refineries'){
+    document.getElementById('refineries-tbody').innerHTML=DB.refineries.map(r=>`<tr>
+      <td><strong>${r.name}</strong></td><td style="color:var(--steel);font-size:12px;">${r.address}</td>
+      <td>${r.fuel||'—'}</td><td style="color:var(--steel);font-size:12px;">${r.contact||'—'}</td>
+      <td><span class="badge ${r.status==='active'?'badge-green':'badge-red'}">${r.status==='active'?'Active':'Inactive'}</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="openEdit('refinery',${r.id})"><i class="fa fa-pen"></i></button> <button class="btn btn-danger btn-sm" onclick="delItem('refineries',${r.id})"><i class="fa fa-trash"></i></button></td>
+    </tr>`).join('');
+  }
+  if(type==='drivers'){
+    document.getElementById('drivers-tbody').innerHTML=DB.drivers.map(d=>`<tr>
+      <td><strong>${d.name}</strong></td><td>${d.phone||'—'}</td>
+      <td><span class="badge badge-blue">${d.license||'—'}</span></td><td style="color:var(--steel);">${d.truck||'Non assigné'}</td>
+      <td><span class="badge ${d.status==='available'?'badge-green':d.status==='off'?'badge-red':'badge-orange'}">${d.status==='available'?'Disponible':d.status==='off'?'Congé':'En route'}</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="openEdit('driver',${d.id})"><i class="fa fa-pen"></i></button> <button class="btn btn-danger btn-sm" onclick="delItem('drivers',${d.id})"><i class="fa fa-trash"></i></button></td>
+    </tr>`).join('');
+  }
+  if(type==='trucks'){
+    document.getElementById('trucks-tbody').innerHTML=DB.trucks.map(t=>`<tr>
+      <td><strong>${t.plate}</strong></td><td>${t.model||'—'}</td>
+      <td>${(t.capacity||0).toLocaleString('fr-CA')} L</td><td>${t.compartments||'—'}</td>
+      <td><span class="badge ${t.status==='available'?'badge-green':t.status==='maintenance'?'badge-red':'badge-orange'}">${t.status==='available'?'Disponible':t.status==='maintenance'?'Maintenance':'En route'}</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="openEdit('truck',${t.id})"><i class="fa fa-pen"></i></button> <button class="btn btn-danger btn-sm" onclick="delItem('trucks',${t.id})"><i class="fa fa-trash"></i></button></td>
+    </tr>`).join('');
+  }
+}
+
+function delItem(coll,id){
+  if(!confirm('Supprimer cet élément?')) return;
+  DB[coll]=DB[coll].filter(x=>x.id!==id);
+  saveDB(); renderTable(coll);
+}
+
+let editingType=null,editingId=null;
+const FORMS={
+  station:`<div class="form-grid"><div><label>Nom</label><input id="f-name"/></div><div><label>Adresse complète</label><input id="f-address" placeholder="123 Rue Principale, Laval, QC, Canada"/></div><div class="cols2"><div><label>Capacité max (L)</label><input id="f-max" type="number"/></div><div><label>Statut</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div></div><div><label>Contact</label><input id="f-contact"/></div></div>`,
+  refinery:`<div class="form-grid"><div><label>Nom</label><input id="f-name"/></div><div><label>Adresse complète</label><input id="f-address"/></div><div class="cols2"><div><label>Type de carburant</label><input id="f-fuel"/></div><div><label>Statut</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div></div><div><label>Contact</label><input id="f-contact"/></div></div>`,
+  driver:`<div class="form-grid"><div class="cols2"><div><label>Nom complet</label><input id="f-name"/></div><div><label>Téléphone</label><input id="f-phone"/></div></div><div class="cols2"><div><label>Permis</label><input id="f-license" placeholder="Classe 1+HDGM"/></div><div><label>Camion (plaque)</label><input id="f-truck" placeholder="FL-001"/></div></div><div><label>Statut</label><select id="f-status"><option value="available">Disponible</option><option value="driving">En route</option><option value="off">Congé</option></select></div></div>`,
+  truck:`<div class="form-grid"><div class="cols2"><div><label>Plaque</label><input id="f-plate"/></div><div><label>Modèle</label><input id="f-model"/></div></div><div class="cols2"><div><label>Capacité (L)</label><input id="f-capacity" type="number"/></div><div><label>Compartiments</label><input id="f-compartments" type="number"/></div></div><div><label>Statut</label><select id="f-status"><option value="available">Disponible</option><option value="driving">En route</option><option value="maintenance">Maintenance</option></select></div></div>`,
+};
+
+function openModal(type){
+  editingType=type;editingId=null;
+  const labels={station:'Nouvelle station',refinery:'Nouvelle raffinerie',driver:'Nouveau chauffeur',truck:'Nouveau camion'};
+  document.getElementById('modal-title').textContent=labels[type];
+  document.getElementById('modal-body').innerHTML=FORMS[type];
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function openEdit(type,id){
+  editingType=type;editingId=id;
+  const collMap={station:'stations',refinery:'refineries',driver:'drivers',truck:'trucks'};
+  const item=DB[collMap[type]].find(x=>x.id===id);
+  if(!item) return;
+  const labels={station:'Modifier station',refinery:'Modifier raffinerie',driver:'Modifier chauffeur',truck:'Modifier camion'};
+  document.getElementById('modal-title').textContent=labels[type];
+  document.getElementById('modal-body').innerHTML=FORMS[type];
+  setTimeout(()=>{
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+    set('f-name',item.name);set('f-address',item.address);set('f-max',item.maxLiters);
+    set('f-contact',item.contact);set('f-fuel',item.fuel);set('f-phone',item.phone);
+    set('f-license',item.license);set('f-truck',item.truck);set('f-plate',item.plate);
+    set('f-model',item.model);set('f-capacity',item.capacity);set('f-compartments',item.compartments);
+    set('f-status',item.status);
+  },10);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+function saveModal(){
+  const type=editingType;
+  const collMap={station:'stations',refinery:'refineries',driver:'drivers',truck:'trucks'};
+  const coll=collMap[type];
+  const v=id=>{const el=document.getElementById(id);return el?el.value:'';};
+  let obj={};
+  if(type==='station') obj={name:v('f-name'),address:v('f-address'),maxLiters:parseInt(v('f-max'))||0,contact:v('f-contact'),status:v('f-status')};
+  if(type==='refinery') obj={name:v('f-name'),address:v('f-address'),fuel:v('f-fuel'),contact:v('f-contact'),status:v('f-status')};
+  if(type==='driver') obj={name:v('f-name'),phone:v('f-phone'),license:v('f-license'),truck:v('f-truck'),status:v('f-status')};
+  if(type==='truck') obj={plate:v('f-plate'),model:v('f-model'),capacity:parseInt(v('f-capacity'))||0,compartments:parseInt(v('f-compartments'))||0,status:v('f-status')};
+  if(editingId){
+    const idx=DB[coll].findIndex(x=>x.id===editingId);
+    if(idx>=0){obj.id=editingId;DB[coll][idx]=obj;}
+  } else {
+    obj.id=DB[coll].reduce((m,x)=>Math.max(m,x.id||0),0)+1;
+    DB[coll].push(obj);
+  }
+  saveDB();closeModal();renderTable(coll);
+}
+
+// PLANNER
+let planStations=[];
+
+function renderPlanner(){
+  const fill=(id,opts,label)=>{
+    const el=document.getElementById(id);
+    el.innerHTML=`<option value="">— ${label} —</option>`+opts.map(o=>`<option value="${o.id}">${o.label}</option>`).join('');
+  };
+  fill('plan-driver',DB.drivers.filter(d=>d.status==='available').map(d=>({id:d.id,label:d.name})),'Sélectionner');
+  fill('plan-truck',DB.trucks.filter(t=>t.status==='available').map(t=>({id:t.id,label:`${t.plate} — ${t.model} (${(t.capacity||0).toLocaleString('fr-CA')} L)`})),'Sélectionner');
+  fill('plan-refinery',DB.refineries.filter(r=>r.status==='active').map(r=>({id:r.id,label:r.name})),'Sélectionner');
+  fill('plan-add-station',DB.stations.filter(s=>s.status==='active').map(s=>({id:s.id,label:s.name})),'Choisir une station');
+  planStations=[];
+  renderPlanStations();
+}
+
+function onDriverChange(){
+  const id=parseInt(document.getElementById('plan-driver').value);
+  const box=document.getElementById('driver-info-box');
+  if(!id){box.classList.add('hidden');return;}
+  const d=DB.drivers.find(x=>x.id===id);
+  if(!d){box.classList.add('hidden');return;}
+  box.classList.remove('hidden');
+  box.innerHTML=`<div class="driver-display">
+    <div class="flex gap-12 items-center" style="margin-bottom:8px;">
+      <div class="driver-avatar">${d.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+      <div><div style="font-weight:500;">${d.name}</div><div style="font-size:12px;color:var(--steel);">${d.license||'—'}</div></div>
+    </div>
+    <div class="info-row"><i class="fa fa-phone"></i>${d.phone||'—'}</div>
+    <div class="info-row"><i class="fa fa-truck"></i>Camion assigné: <strong>${d.truck||'Aucun'}</strong></div>
+  </div>`;
+}
+
+function onTruckChange(){
+  const id=parseInt(document.getElementById('plan-truck').value);
+  const box=document.getElementById('truck-info-box');
+  if(!id){box.classList.add('hidden');return;}
+  const t=DB.trucks.find(x=>x.id===id);
+  if(!t){box.classList.add('hidden');return;}
+  box.classList.remove('hidden');
+  box.innerHTML=`<div class="driver-display">
+    <div class="info-row"><i class="fa fa-id-card"></i><strong>${t.plate}</strong> — ${t.model}</div>
+    <div class="info-row"><i class="fa fa-droplet"></i>Capacité: <strong>${(t.capacity||0).toLocaleString('fr-CA')} L</strong></div>
+    <div class="info-row"><i class="fa fa-table-cells"></i>Compartiments: <strong>${t.compartments||'—'}</strong></div>
+  </div>`;
+}
+
+function onRefineryChange(){
+  const id=parseInt(document.getElementById('plan-refinery').value);
+  const el=document.getElementById('refinery-addr');
+  if(!id){el.textContent='';return;}
+  const r=DB.refineries.find(x=>x.id===id);
+  el.textContent=r?r.address:'';
+}
+
+function addStationToTrip(){
+  const sel=document.getElementById('plan-add-station');
+  const id=parseInt(sel.value);
+  if(!id) return;
+  if(planStations.find(x=>x.id===id)){alert('Station déjà dans la liste.');return;}
+  const s=DB.stations.find(x=>x.id===id);
+  if(!s) return;
+  planStations.push({id:s.id,name:s.name,address:s.address,liters:s.maxLiters||5000});
+  sel.value='';
+  renderPlanStations();
+}
+function removePlanStation(id){planStations=planStations.filter(x=>x.id!==id);renderPlanStations();}
+function renderPlanStations(){
+  const el=document.getElementById('plan-stations-list');
+  if(!planStations.length){el.innerHTML='<div style="color:var(--steel);font-size:13px;text-align:center;padding:12px 0;">Aucune station ajoutée</div>';return;}
+  el.innerHTML=planStations.map((s,i)=>`
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:6px;">
+      <div class="flex justify-between items-center" style="margin-bottom:4px;">
+        <span style="font-weight:500;font-size:13px;">${i+1}. ${s.name}</span>
+        <button class="btn btn-danger btn-sm" onclick="removePlanStation(${s.id})"><i class="fa fa-trash"></i></button>
+      </div>
+      <div style="font-size:11px;color:var(--steel);margin-bottom:6px;">${s.address}</div>
+      <div class="flex items-center gap-8">
+        <label style="margin:0;white-space:nowrap;">Quantité:</label>
+        <input type="number" value="${s.liters}" min="100" step="100" style="width:90px;font-size:13px;text-align:right;" onchange="planStations[${i}].liters=parseInt(this.value)||0"/>
+        <span style="font-size:12px;color:var(--steel);">L</span>
+      </div>
+    </div>`).join('');
+}
+
+const COLORS=['#2ECC71','#3B8BEB','#F5A623','#E74C3C','#9B59B6','#1ABC9C'];
+
+function calcRoute(){
+  const driverId=parseInt(document.getElementById('plan-driver').value);
+  const truckId=parseInt(document.getElementById('plan-truck').value);
+  const refineryId=parseInt(document.getElementById('plan-refinery').value);
+  if(!driverId||!truckId||!refineryId){alert('Veuillez sélectionner un chauffeur, un camion et une raffinerie.');return;}
+  if(!planStations.length){alert('Ajoutez au moins une station à livrer.');return;}
+  const truck=DB.trucks.find(x=>x.id===truckId);
+  const refinery=DB.refineries.find(x=>x.id===refineryId);
+  const driver=DB.drivers.find(x=>x.id===driverId);
+  const cap=truck.capacity||25000;
+
+  for(const s of planStations){
+    if(s.liters>cap){alert(`La station "${s.name}" demande ${s.liters.toLocaleString('fr-CA')} L, dépassant la capacité du camion (${cap.toLocaleString('fr-CA')} L).`);return;}
+  }
+
+  const trips=[];
+  let cur=[],load=0;
+  for(const s of planStations){
+    if(load+s.liters>cap){trips.push({stations:[...cur],load});cur=[];load=0;}
+    cur.push(s);load+=s.liters;
+  }
+  if(cur.length) trips.push({stations:[...cur],load});
+
+  const totalLiters=trips.reduce((a,t)=>a+t.load,0);
+  let html=`<div class="card" style="margin-bottom:0;">
+    <div class="card-title" style="margin-bottom:14px;"><i class="fa fa-route"></i> ${trips.length} voyage(s) planifié(s)</div>`;
+
+  trips.forEach((trip,i)=>{
+    const col=COLORS[i%COLORS.length];
+    const pct=Math.round((trip.load/cap)*100);
+    const steps=[
+      {icon:'fa-home',label:'Dépôt de départ',note:'Point initial',col:'#555'},
+      {icon:'fa-industry',label:refinery.name,note:`Chargement: ${trip.load.toLocaleString('fr-CA')} L`,col},
+      ...trip.stations.map(s=>({icon:'fa-gas-pump',label:s.name,note:`${s.liters.toLocaleString('fr-CA')} L — ${s.address}`,col:'#445'})),
+      {icon:'fa-home',label:'Retour au dépôt',note:'Fin du voyage',col:'#555'},
+    ];
+    const origin=encodeURIComponent(refinery.address);
+    const dest=encodeURIComponent(trip.stations[trip.stations.length-1].address);
+    const waypts=trip.stations.slice(0,-1).map(s=>encodeURIComponent(s.address)).join('|');
+    const mapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}${waypts?'&waypoints='+waypts:''}&travelmode=driving`;
+    const wazeUrl=`https://waze.com/ul?q=${encodeURIComponent(trip.stations[0].address)}&navigate=yes`;
+
+    html+=`<div class="trip-card" style="border-left:3px solid ${col};">
+      <div class="trip-header">
+        <div><span style="font-weight:600;color:${col};">Voyage ${i+1}</span><span style="color:var(--steel);font-size:12px;margin-left:10px;">${trip.stations.length} station(s) · ${trip.load.toLocaleString('fr-CA')} L</span></div>
+        <div class="flex items-center gap-8">
+          <div style="width:60px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${col};border-radius:3px;"></div></div>
+          <span style="font-size:11px;color:var(--steel);">${pct}%</span>
+        </div>
+      </div>
+      <div class="trip-body">
+        <div>${steps.map((step,si)=>{
+          const isLast=si===steps.length-1;
+          return `<div class="step">
+            <div class="step-icon-col">
+              <div class="step-dot" style="background:${step.col}20;border:1.5px solid ${step.col};"><i class="fa ${step.icon}" style="font-size:11px;color:${step.col};"></i></div>
+              ${!isLast?'<div class="step-line"></div>':''}
+            </div>
+            <div class="step-content"><div class="step-name">${step.label}</div><div class="step-note">${step.note}</div></div>
+          </div>`;
+        }).join('')}</div>
+        <div class="flex gap-8" style="margin-top:12px;flex-wrap:wrap;">
+          <a href="${mapsUrl}" target="_blank" class="btn btn-green btn-sm"><i class="fab fa-google"></i> Google Maps — Voyage ${i+1}</a>
+          <a href="${wazeUrl}" target="_blank" class="btn btn-blue btn-sm"><i class="fa fa-car"></i> Waze — Voyage ${i+1}</a>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html+=`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:4px;">
+    <div style="font-size:12px;color:var(--steel);font-weight:600;letter-spacing:.5px;margin-bottom:8px;">RÉSUMÉ JOURNÉE — ${driver.name} · ${truck.plate}</div>
+    <div class="summary-grid">
+      <div class="summary-cell"><div class="summary-val">${trips.length}</div><div class="summary-lbl">Voyages</div></div>
+      <div class="summary-cell"><div class="summary-val">${totalLiters.toLocaleString('fr-CA')}</div><div class="summary-lbl">Litres livrés</div></div>
+      <div class="summary-cell"><div class="summary-val">${planStations.length}</div><div class="summary-lbl">Stations</div></div>
+    </div>
+  </div></div>`;
+
+  document.getElementById('plan-result').innerHTML=html;
+
+  DB.trips.push({date:new Date().toLocaleDateString('fr-CA'),driver:driver.name,truck:truck.plate,voyages:trips.length,stationsCount:planStations.length,liters:totalLiters});
+  saveDB();
+}
+
+loadDB();
+renderDashboard();
+</script>
+</body>
+</html>
